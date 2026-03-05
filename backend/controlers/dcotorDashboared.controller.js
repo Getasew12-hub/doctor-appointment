@@ -59,9 +59,12 @@ export const Appointment=async (req,res) => {
     try {
         const {val}=req.body;
         const {_id}=req.user;
+        const {appointmentId, status}=req.body;
 
-        await appointment.findByIdAndUpdate({doctorId:_id,status:val});
-        return res.status(200).json({success:true});
+        if(!appointmentId || !status) return res.status(400).json({success:false,message:"Please enter all value"});
+
+     const update= await appointment.findOneAndUpdate({_id:appointmentId,doctorId:_id},{status:status},{new:true});
+        return res.status(200).json({success:true,data:update});
         
     } catch (error) {
           console.log("error on all appointments",error.message);

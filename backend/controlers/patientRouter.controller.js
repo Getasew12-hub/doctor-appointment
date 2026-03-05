@@ -23,6 +23,9 @@ export const AddAppointments=async(req,res)=>{
        const {doctorId,data}=req.body;
        if(!_id) return res.status(400).json({success:false,message:"Something went wrong"});
 
+       if(!doctorId || !data || !data.date || !data.time) return res.status(400).json({success:false,message:"Please enter all required values"});
+       
+
        if(!doctorId) return res.status(400).json({success:false,message:"Please enter all value"});
 
        const checkIsDcotorFree=await Appointment.find({doctorId,date:data.date,time:data.time});
@@ -52,11 +55,12 @@ export const DeleteAppointments=async(req,res)=>{
        const {_id}=req.user;
        const {id}=req.params;
        if(!_id) return res.status(400).json({success:false,message:"Something went wrong"});
-        
+     if(!id) return res.status(400).json({success:false,message:"Please enter all value"});
+     
        const isPaid=await Appointment.findById(id);
        if(isPaid.paid) return res.status(400).json({success:false,message:"You can't delete this appointment"});
        
-       if(!id) return res.status(400).json({success:false,message:"Please enter all value"});
+      
 
        const appointment=await Appointment.findByIdAndDelete(id);
        return res.status(200).json({success:true,data:appointment});

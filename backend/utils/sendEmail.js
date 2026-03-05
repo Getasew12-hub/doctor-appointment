@@ -45,7 +45,7 @@ export const SEND_PAYMENT_SECCESS=async(to,name,amount)=>{
     const message={
         from:`"CareSlot" <${process.env.SENDER_EMAIL}>`,
         to,
-        subject:"Successfuly payment",
+        subject:"Payment successful",
         html:PAYMENT_SECCESSFUL.replace("{username}",name).replace("{amount}",amount)
 
     }
@@ -55,12 +55,12 @@ export const SEND_PAYMENT_SECCESS=async(to,name,amount)=>{
 }
 
 
-export const SEND_DOCTOR_ACCOUNT_CREATED=async(to,name,password)=>{
+export const SEND_DOCTOR_ACCOUNT_CREATED=async(to,name)=>{
     const message={
         from:`"CareSlot" <${process.env.SENDER_EMAIL}>`,
         to,
         subject:"Your account has been created",
-        html:ACCOUNT_CREATED.replace("{username}",name).replace("{password}",password)
+        html:ACCOUNT_CREATED.replace("{username}",name)
 
     }
 

@@ -20,19 +20,19 @@ const userSchema=new mongoose.Schema({
     },
     emailVerifyCode:{
         type:String,
-        default:""
+        default:null
     },
     emailVerifyExpire:{
         type:Date,
-        default:""
+        default:null
     },
     resetPasswordToken:{
         type:String,
         default:""
     },
-    resetPasswordExpire:{
+    resetpasswordexpire:{
         type:Date,
-        default:""
+        default:null
     },
     role:{
         type:String,

@@ -12,22 +12,21 @@ export const userProtect = async(req, res, next) => {
         if(!getuserid) return res.status(401).json({message:"Not authorized"});
 
         const user=await User.findById(getuserid.id);
-        if(!user) return res.status(401).json({message:"Not authorized"});
-        req.user=user;
-        next();
+        
         if(!user) return res.status(401).json({message:"Not authorized"});
         req.user=user;
         next();
 
 
         
+   
     } catch (error) {
-        console.log("error on protect router",error.message);
-        return res.status(500).json({message:"Internal server error"});
-        
-    }
-    
-}
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: "Not authorized" });
+        }
+        console.error("error on protect middleware", error.message);
+        return res.status(500).json({ message: "Internal server error" });
+    }}
 export const doctorProtect=async (req,res,next) => {
     try {
         const token=req.cookies.token;

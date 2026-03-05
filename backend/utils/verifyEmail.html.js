@@ -246,18 +246,12 @@ export const ACCOUNT_CREATED=`<!DOCTYPE html>
                     </tr>
                     
                     <tr>
-                        <td style="padding: 0 40px;">
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f3f4f6; border-radius: 8px;">
-                                <tr>
-                                    <td style="padding: 25px;">
-                                        <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600; color: #374151; text-transform: uppercase;">Your Login Details</p>
-                                        <p style="margin: 0; font-size: 15px; color: #4b5563;">
-                                            <strong>Username:</strong> {{username}}<br>
-                                            <strong>Password:</strong> <span style="font-family: monospace; background: #e5e7eb; padding: 2px 4px; border-radius: 4px;">{password}</span>
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                        <td style="padding: 0 40px 40px 40px;">
+                            <div style="border-left: 4px solid #f59e0b; background-color: #fffbeb; padding: 15px;">
+                                <p style="margin: 0; font-size: 13px; color: #92400e; line-height: 20px;">
+                                    <strong>Security Tip:</strong> For your protection, we recommend changing this password immediately after your first login.
+                                </p>
+                            </div>
                         </td>
                     </tr>
 

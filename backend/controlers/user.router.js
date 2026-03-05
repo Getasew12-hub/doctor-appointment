@@ -1,22 +1,20 @@
 import Appointment from "../model/appointmet.js";
+import User from "../model/user.js";
 
 //TODO
 export const UserProfile=async (req,res) => {
     try {
-        return res.status(200).json({sucess:true,data:req.user});
-        
+        return res.status(200).json({success:true,data:req.user});
     } catch (error) {
-        console.log("error on user prorile",error.message);
+        console.log("error on user profile",error.message);
         return res.status(500).json({success:false,message:"Internal server error"});
     }
-    
 }
-
 export const MyAppointment=async (req,res) => {
     try {
         const {_id}=req.user;
 
-        const userAppointment=await Appointment.find({_id});
+        const userAppointment=await Appointment.find({userId:_id});
         return res.status(200).json({success:true,data:userAppointment});
 
     } catch (error) {
@@ -27,6 +25,7 @@ export const MyAppointment=async (req,res) => {
     
 }
 export const UpdateProfile=async (req,res) => {
+    //TODO
     try {
         const {_id}=req.body;
         const {data}=req.body;

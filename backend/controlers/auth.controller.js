@@ -7,7 +7,7 @@ import crypto from "crypto";
 
 const createToken=async(id,res)=>{
 
-    const token= jwt.sign({id},process.env.SECRET_KEY);
+    const token= jwt.sign({id},process.env.SECRET_KEY,{expiresIn:"7d"});
     res.cookie("token",token,{
         httpOnly:true,
         secure:process.env.NODE_ENV!=="development",
@@ -33,14 +33,13 @@ export const Signup =async (req, res) => {
         })
     }
 
-    const emailRegex=/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if(!emailRegex.test(email)){
         return res.status(400).json({
             success:false,
             message:"Please enter a valid email address"
         })
     }
-
     const checkUserExistance=await User.find({email});
      if(checkUserExistance.length>0){
         return res.status(400).json({
@@ -50,8 +49,7 @@ export const Signup =async (req, res) => {
      }
   const hashpassword=await bcrypt.hash(password,10);
      
-  const sixDigits=Math.floor(100000+Math.random()*900000);
-  const emailcode=sixDigits;
+  const emailcode = crypto.randomInt(100000, 1000000);  
   const expireDate=new Date();
   expireDate.setDate(expireDate.getDate()+1);
   
@@ -97,8 +95,6 @@ export const Login = async(req, res) => {
 
             const getuser=await User.find({email});
             if(!getuser || getuser.length==0) return res.status(400).json({success:false,message:"User doesn't exist"})
-                console.log("the user data is this ",getuser)
-            const userpassword=getuser[0].password;
             
             const checkpassword=await bcrypt.compare(password,userpassword);
 
@@ -107,12 +103,15 @@ export const Login = async(req, res) => {
             await createToken(getuser[0]._id,res);
 
             return res.status(200).json({
-                success:true,
-                message:"user successfuly login",
-                data:getuser[0]
-            })
-            
-        
+                success:true,message:"Login successful", data: {
+                ...getuser[0]._doc,
+                password: undefined,
+                resetpasswordtoken: undefined,
+                restpasswordexpire: undefined,
+                emailVerifyCode: undefined,
+                emailVerifyExpire: undefined
+            }});
+                   
        } catch (error) {
          console.log("error on login",error.message);
     return res.status(500).json({success:false,message:"Internal server error"})
@@ -126,8 +125,7 @@ export const Logout = (req, res) => {
             secure:process.env.NODE_ENV==="production",
             sameSite:process.env.NODE_ENV==="production"?"none":"strict",
         });
-        return res.status(200).json({sucess:true,message:"Logout successful"});
-        
+        return res.status(200).json({success:true,message:"Logout successful"});        
      } catch (error) {
         console.log("error on logout",error.message);
         return res.status(500).json({success:false,message:"Internal server error"})
@@ -169,14 +167,16 @@ export const ForgetPassword=async(req,res)=>{
         const user=getuser[0];
         const token=  crypto.randomBytes(20).toString('hex');
         const now=new Date();
-        const day=new Date(now.getTime()+1000*60*60);
-        await User.updateOne({email:user.email},{$set:{resetpasswordtoken:token,restpasswordexpire:day}});
-        
-        await PASSWORD_FORGOT(user.email,token);
-        
+        const day=new Date(now.getTime()+1000*60*60);                            
+       await User.updateOne({email:user.email},{$set:{resetpasswordtoken:token,resetpasswordexpire:day}}); 
+
+       await PASSWORD_FORGOT(user.email,token);
+
         return res.status(200).json({success:true,message:"We sent an link on you email address to reset password,please check you email"});
         
     } catch (error) {
+          console.log("error on forget password", error.message);
+         return res.status(500).json({success:false, message:"Internal server error"});
         
     }
 }
@@ -185,14 +185,13 @@ export const ResetPassword=async(req,res)=>{
         const  {password}=req.body;
         const {token}=req.params;
         if(!token || !password) return res.status(400).json({success:false,message:"Please enter all value"})
+       
+      
+        if(password.length<6) return res.status(400).json({success:false,message:"Password must be at least 6 characters"})
         const getuser=await User.find({resetpasswordtoken:token,restpasswordexpire:{$gt:new Date()}});
         if(getuser.length==0) return res.status(400).json({success:false,message:"Invalid token or you use expire token"});
         const user=getuser[0];
-        const hashpassword=await bcrypt.hash(password,10);
-        await User.updateOne({email:user.email},{$set:{password:hashpassword,resetpasswordtoken:null,restpasswordexpire:null}});
-        return res.status(200).json({success:true,message:"Password reset successfuly"});
-
-        
+        const hashpassword=await bcrypt.hash(password,10);        
     } catch (error) {
         console.log("error on reset password",error.message);
         return res.status(500).json({success:false,message:"Internal server error"})

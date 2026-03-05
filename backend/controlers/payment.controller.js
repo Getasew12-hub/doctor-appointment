@@ -47,13 +47,23 @@ export const chekPayment = async (req, res) =>{
 
 try {
     const user=req.user;
-    const {sessionId,appointmentId,fees}=req.body;
+    const {sessionId,appointmentId}=req.body;
+      
+        if(!sessionId || !appointmentId) return res.status(400).json({message:"Missing required fields"});
    
+   
+
+   const appt = await appointment.findById(appointmentId).populate('doctor','fees');
+   if(!appt)  return res.status(404).json({message:"Appointment not found"});
+   
+   if(appt.userId.toString() !== user._id.toString()) return res.status(403).json({message:"Unauthorized"});
+   
+
     const status=await stripe.checkout.sessions.retrieve(sessionId);
     if(status.payment_status=='paid'){
         
         await appointment.findByIdAndUpdate({_id:appointmentId},{paid:true});
-       SEND_PAYMENT_SECCESS(user.email,user.name,fees);
+      await SEND_PAYMENT_SECCESS(user.email,user.name,appt.doctor.fees);
      return res.status(200).json(true)
     }
 

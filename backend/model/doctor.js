@@ -54,7 +54,9 @@ const doctorSchema=new mongoose.Schema({
     
     role:{
         type:String,
-        default:"doctor"
+        default:"doctor",
+        enum: ["doctor"],
+        immutable: true
     }
 })
 

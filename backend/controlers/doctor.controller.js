@@ -12,16 +12,13 @@ export const TopDoctors=async (req,res) => {
     return res.status(200).json({success:true,data:topDoctors});
         
     } catch (error) {
-        console.log("error on top doctors",error.message);
-        return res.status
-        
-    }
-    
+        console.log("error on get single doctor", error.message);
+        return res.status(500).json({success: false, message: "Failed to fetch doctor"});
+    }    
 }
 
 
-export const AllDcotors=async (req,res) => {
-    try {
+export const AllDoctors=async (req,res) => {    try {
         const getAlldoctors=await Doctors.find();
         
         const allDoctors=getAlldoctors.map((doctor)=>{
@@ -61,6 +58,9 @@ export const GetSingleDoctor=async (req,res) => {
     try {
         const {id}=req.params;
         const getSingleDoctor=await Doctors.findById(id);
+         if (!getSingleDoctor) {
+            return res.status(404).json({success: false, message: "Doctor not found"});
+         }
         const {password,...others}=getSingleDoctor._doc;
 
         return res.status(200).json({success:true,data:others});
