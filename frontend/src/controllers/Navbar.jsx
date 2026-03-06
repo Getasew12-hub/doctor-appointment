@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import {Link,useLocation,useNavigate} from "react-router-dom"
 import {ChevronDown, CircleUser, Contact, Home, Info, LogIn, LogOut, Menu, Users, X} from "lucide-react"
 import MobileView from './MobileView';
+import userStore from '../store/user';
 
 const navLinks=[{
   name:"Home",
@@ -22,10 +23,12 @@ const navLinks=[{
 
 
 function Navbar({setAddminMobileOpen}) {
-  const user=true;
+  const {user:userinfo,LogoutUser}=userStore(state=>state);
+  const user=userinfo?.isVerified ? userinfo : null;
+  console.log("is user exists",user);
   const navigate=useNavigate();
   const pathStart=useLocation().pathname.split("/")[1];
-  console.log("this is path",pathStart);
+ 
 
 const [openMobileview,setOpenMobileview]=useState(false);
 
@@ -69,7 +72,7 @@ function handleMobileView(){
                     <button className='cursor-pointer' onClick={()=>navigate("/my-profile")} >My Profile</button>
                     <button  className='cursor-pointer' onClick={()=>navigate("/my-appointment")}>My Appointments</button>
                    
-                     <button  className='cursor-pointer' onClick={()=>navigate("/my-profile")}>Logout</button>
+                     <button  className='cursor-pointer' onClick={LogoutUser}>Logout</button>
 
                   </div>
                   </div>

@@ -89,12 +89,15 @@ export const Signup =async (req, res) => {
    }
 };
 export const Login = async(req, res) => {
+   
        try {
         const {email,password} =req.body;
         if(!email || !password) return res.status(400).json({success:false,message:"Please enter all value"})
 
             const getuser=await User.find({email});
             if(!getuser || getuser.length==0) return res.status(400).json({success:false,message:"User doesn't exist"})
+
+            const userpassword=getuser[0].password;
             
             const checkpassword=await bcrypt.compare(password,userpassword);
 
@@ -138,23 +141,48 @@ export const VerifyEmail=async(req,res)=>{
    
     try {
         const {emailcode}=req.body;
+       
+        const {email}=req.user;
         
         if(!emailcode) return res.status(400).json({success:false,message:"Please enter all value"})
 
-        const getuser=await User.find({emailVerifyCode:emailcode,emailVerifyExpire:{$gt:new Date()}});
+        const getuser=await User.find({email,emailVerifyCode:emailcode,emailVerifyExpire:{$gt:new Date()}});
         if(getuser.length==0) return res.status(400).json({success:false,message:"Invalid code or you use expire code"});
 
         const user=getuser[0];
-        await User.updateOne({email:user.email},{$set:{isVerify:true,emailVerifyCode:null,emailVerifyExpire:null}});
+        await User.updateOne({email:user.email},{$set:{isVerified:true,emailVerifyCode:null,emailVerifyExpire:null}});
 
         return res.status(200).json({
             success:true,
             message:"Email verified successfuly",
-            data:user
+            
         });
     } catch (error) {
         console.log("error on verify email",error.message);
         return res.status(500).json({success:false,message:"Internal server error"})
+    }
+}
+export const ResendCode=async(req,res)=>{
+    try {
+   const {email}=req.user;
+      if(!email) return res.status(400).json({success:false,message:"Please enter all value"})
+   
+        const getuser=await User.find({email});
+        if(getuser.length==0) return res.status(400).json({success:false,message:"User doesn't exist"})
+        const user=getuser[0];
+        const emailcode = crypto.randomInt(100000, 1000000);  
+        const expireDate=new Date();
+        expireDate.setDate(expireDate.getDate()+1);
+        await User.updateOne({email:user.email},{$set:{emailVerifyCode:emailcode,emailVerifyExpire:expireDate}});
+
+        await sendEmail(email,emailcode);
+        return res.status(200).json({success:true,message:"We sent an email code on your email,please check your email"});
+    
+        
+    } catch (error) {
+        console.log("error on resend code",error.message);
+        return res.status(500).json({success:false,message:"Internal server error"})
+        
     }
 }
 export const ForgetPassword=async(req,res)=>{
@@ -191,7 +219,11 @@ export const ResetPassword=async(req,res)=>{
         const getuser=await User.find({resetpasswordtoken:token,restpasswordexpire:{$gt:new Date()}});
         if(getuser.length==0) return res.status(400).json({success:false,message:"Invalid token or you use expire token"});
         const user=getuser[0];
-        const hashpassword=await bcrypt.hash(password,10);        
+
+        const hashpassword=await bcrypt.hash(password,10);   
+        await User.updateOne({email:user.email},{$set:{password:hashpassword,resetpasswordtoken:undefined,restpasswordexpire:undefined}});
+
+        return res.status(200).json({success:true,message:"Password reset successful"});     
     } catch (error) {
         console.log("error on reset password",error.message);
         return res.status(500).json({success:false,message:"Internal server error"})
@@ -201,7 +233,7 @@ export const ResetPassword=async(req,res)=>{
 export const CheckAuth=(req,res)=>{
    
        
-      return res.status(200).json(req.user);
+      return res.status(200).json({success:true,data:req.user});
    
 }
 

@@ -1,6 +1,7 @@
 import { ClipboardClock, Contact, Home, Info, LogIn, LogOut, User, Users, X } from 'lucide-react'
 import React, { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import userStore from '../store/user'
 
 const navLinks=[{
   name:"Home",
@@ -22,7 +23,7 @@ const navLinks=[{
 }]
 
 function MobileView({handleMobileView,openMobileview,setOpenMobileview}) {
-    const user=true;
+    const {user,LogoutUser}=userStore(state=>state);
     const mobileref=useRef();
     useEffect(()=>{
 
@@ -48,7 +49,7 @@ function MobileView({handleMobileView,openMobileview,setOpenMobileview}) {
               <Link to={"/Contact"} onClick={handleMobileView}  className='mobileview'><User size={19} />My Profile</Link>
               </>
          }
-           {user ? <button  className='mobileview'><LogOut size={19}/>Logout</button>:<button  className='mobileview'><LogIn size={19}/>Login</button>}
+           {user ? <button  className='mobileview'><LogOut size={19} onClick={LogoutUser}/>Logout</button>:<button  className='mobileview'><LogIn size={19}/>Login</button>}
        </div>
   )
 }

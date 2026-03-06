@@ -2,6 +2,7 @@ import express from "express"
 import env from "dotenv"
 import cookieParser from "cookie-parser"
 import {cloudinaryConfig} from "./config/cloudinary.js"
+import cors from "cors"
 
 import {userProtect,doctorProtect,adminProtect} from "./middleware/protect.js"
 import AuthRouter from "./routers/auth.router.js"
@@ -19,6 +20,10 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
+app.use(cors({
+    origin:process.env.FRONTEND_URL,
+    credentials:true
+}))
 
 cloudinaryConfig();
 dbconnect();

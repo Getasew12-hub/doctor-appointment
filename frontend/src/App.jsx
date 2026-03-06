@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import {Routes,Route} from "react-router-dom"
+import React, { useEffect, useState } from 'react'
+import {Routes,Route,Navigate} from "react-router-dom"
+import { Toaster } from 'react-hot-toast'
+
 import Home from "./pages/public/Home"
 import Navbar from "./controllers/Navbar"
 import DoctorDetail from './pages/public/DoctorDetail'
@@ -29,13 +31,27 @@ import DcotorDashboardLayout from "./pages/Doctor/Layout"
 import DoctorDashboard from './pages/Doctor/DoctorDashboard'
 import DoctorsAppointments from "./pages/Doctor/Appointments"
 import DoctorsPatients from './pages/Doctor/PatientList'
- 
+import EmailVerify from './pages/users/EmailVerify'
+ import userStore from './store/user'
+import { Loader } from 'lucide-react'
+import PasswordReset from './pages/users/PasswordReset'
+import ForgetPassword from './pages/users/ForgetPassword'
+import EmialVeficationSend from './pages/users/EmialVeficationSend'
 
 function App() {
+  
+  const {user,checkuser,CheckAuth}=userStore();
    const [addminMobileOpen,setAddminMobileOpen]=useState(false);
+  useEffect(() => {
+    CheckAuth();
+  },[CheckAuth]);
+   
      const location=useLocation();
      const pathnameStart=location.pathname.split("/")[1];
+const userRole=user?.role;
+const isverify=user?.isVerified;
 
+ if (checkuser) return <div className='flex justify-center items-center h-screen '><Loader size={45} className='animate-spin'/></div>;
 
   return (
     <div className='min-h-screen overflow-hidden'>
@@ -48,7 +64,12 @@ function App() {
         <Route path='/contact' element={<Contact/>}/>
         <Route path='/my-profile' element={<Profile/>}/>
         <Route path='/my-appointment' element={<MyAppointments/>}/>
-        <Route path='/login' element={<Login/>}/>
+        <Route path='/forget-password' element={<ForgetPassword/>}/>
+        <Route path='/email-verify-send' element={<EmialVeficationSend/>}/>
+
+        <Route path='/password-reset/:token' element={<PasswordReset/>}/>
+        <Route path="/email-verify" element={isverify ? <Navigate to="/"/>: <EmailVerify/>}/>
+        <Route path='/login' element={user ?(isverify ? <Navigate to="/"/> :<Navigate to="/email-verify"/>): <Login/>}/>
       
         <Route path='/doctors' element={<Layout/>} >
              <Route index element={<DoctorsList/>}/>
@@ -78,6 +99,8 @@ function App() {
       </Routes>
 
     {pathnameStart!=="admin" && pathnameStart!=="doctor-dashboard" && pathnameStart!=="login" && pathnameStart!=="singup" && <Footer/>}  
+
+      <Toaster/>
     </div>
   )
 }

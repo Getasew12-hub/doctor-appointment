@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
+import userStore from "../../store/user"
+import { Loader } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const CreateAccount = () => {
+  const {loading,SignupUser,LoginUser}=userStore()
     const [type, setType] = useState('login');
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     email: '',
     password: ''
   });
@@ -11,6 +15,20 @@ const CreateAccount = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  function hadleSubmite(e) {
+    e.preventDefault();
+   if(type==="login"){
+   
+    LoginUser(formData)
+    
+   }else{
+   
+ 
+    SignupUser(formData)
+   }
+   
+  }
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-white px-4">
@@ -23,14 +41,14 @@ const CreateAccount = () => {
           <p className="text-gray-500 text-sm">Please {type=="singup" ? "singup" : "login"} to book appointment</p>
         </header>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={hadleSubmite}>
           {/* Full Name Input */}
         {type=="singup" && <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-600">Full Name</label>
             <input
               type="text"
-              name="fullName"
-              value={formData.fullName}
+              name="name"
+              value={formData.name}
               onChange={handleChange}
               placeholder="Enter your full name"
               className="w-full p-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-main transition-all"
@@ -47,6 +65,7 @@ const CreateAccount = () => {
               onChange={handleChange}
               placeholder="Enter your email"
               className="w-full p-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-main transition-all"
+              required
             />
           </div>
 
@@ -60,15 +79,18 @@ const CreateAccount = () => {
               onChange={handleChange}
               placeholder="Create a password"
               className="w-full p-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-main transition-all"
+              required
             />
           </div>
-
+          {/* forget password  */}
+         {type=="login" && <div  className="text-sm text-right text-gray-600 ">  <Link to={"/forget-password"} className='cursor-pointer'> Forget password ?</Link></div> }
           {/* Action Button */}
           <button
+          disabled={loading}
             type="submit"
-            className="w-full py-3 bg-main text-white rounded-md font-medium  transition-colors mt-2"
+            className={`w-full py-3 flex items-center justify-center bg-main text-white rounded-md font-medium  transition-colors mt-2 cursor-pointer ${loading && "opacity-50! cursor-not-allowed!"}`}
           >
-            {type=="singup" ? "Singup" : "Login"}            
+            {loading ? <Loader size={23} className="animate-spin"/>:(type=="singup" ? "Singup" : "Login")}            
           </button>
         </form>
 

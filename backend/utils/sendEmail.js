@@ -34,7 +34,7 @@ export const PASSWORD_FORGOT=async(to,token)=>{
         from:`"CareSlot" <${process.env.SENDER_EMAIL}>`,
         to,
         subject:"Reset Your password",
-        html:EMAIL_PASSWOD_FORGET.replace("{passwordrest}",token),
+        html:EMAIL_PASSWOD_FORGET.replace("{passwordrest}",process.env.FRONTEND_URL+"/password-reset/"+token),
         
         
     }
