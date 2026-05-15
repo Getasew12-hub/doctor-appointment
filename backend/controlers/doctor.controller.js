@@ -57,6 +57,7 @@ export const GetDoctorBySpeciality=async (req,res) => {
 export const GetSingleDoctor=async (req,res) => {
     try {
         const {id}=req.params;
+        console.log("the coming messange now ",id);
         const getSingleDoctor=await Doctors.findById(id);
          if (!getSingleDoctor) {
             return res.status(404).json({success: false, message: "Doctor not found"});
@@ -64,6 +65,27 @@ export const GetSingleDoctor=async (req,res) => {
         const {password,...others}=getSingleDoctor._doc;
 
         return res.status(200).json({success:true,data:others});
+        
+    } catch (error) {
+        console.log("error on top doctors",error.message);
+        return res.status
+        
+    }
+    
+}
+
+export const GetReletedDoctors=async (req,res) => {
+    try {
+       
+        const {id} =req.params;
+       
+        const {speciality}=req.params;
+        const getAlldoctors=await Doctors.find({_id:{$ne:id}, speciality}).limit(4);
+       const allDoctors=getAlldoctors.map((doctor)=>{
+           const {password,...others}=doctor._doc;
+           return others;
+       })
+        return res.status(200).json({success:true,data:allDoctors});
         
     } catch (error) {
         console.log("error on top doctors",error.message);

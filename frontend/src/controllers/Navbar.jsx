@@ -24,8 +24,10 @@ const navLinks=[{
 
 function Navbar({setAddminMobileOpen}) {
   const {user:userinfo,LogoutUser}=userStore(state=>state);
-  const user=userinfo?.isVerified ? userinfo : null;
-  console.log("is user exists",user);
+  const admin=userinfo?.role==="admin";
+  const doctor=userinfo?.role==="doctor";
+  const user= userinfo?.role=="user" ? (userinfo?.isVerified ? userinfo : null) :userinfo;
+
   const navigate=useNavigate();
   const pathStart=useLocation().pathname.split("/")[1];
  
@@ -58,6 +60,9 @@ function handleMobileView(){
               {navLinks.map((link,index)=>(
                 <Link key={index} to={link.link} className='hover:underline underline-offset-8 decoration-main' >{link.name}</Link>
               ))}
+             {admin && <Link to={"/admin"} className='hover:underline underline-offset-8 decoration-main'>Dashboard</Link>}
+
+             {doctor && <Link to={"/doctor-dashboard"} className='hover:underline underline-offset-8 decoration-main'>Dashboard</Link>}
              {!user && <button className='bg-main text-white py-0.5 px-3 rounded-full cursor-pointer text-sm' onClick={()=>navigate("/login")}>Login</button>}
             
             </div>

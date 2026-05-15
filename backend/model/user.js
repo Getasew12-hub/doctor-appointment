@@ -38,6 +38,10 @@ const userSchema=new mongoose.Schema({
         type:String,
         default:"user",
         enum:["user","admin"]
+    },
+    fillDetail:{
+        type:Boolean,
+        default:false
     }
     
 },{

@@ -48,11 +48,11 @@ function App() {
    
      const location=useLocation();
      const pathnameStart=location.pathname.split("/")[1];
-const userRole=user?.role;
-const isverify=user?.isVerified;
+
 
  if (checkuser) return <div className='flex justify-center items-center h-screen '><Loader size={45} className='animate-spin'/></div>;
-
+const userRole=user?.role;
+const isverify= user?.role=="user" ? user?.isVerified :true;
   return (
     <div className='min-h-screen overflow-hidden'>
       <ScrollToTop />
@@ -67,7 +67,7 @@ const isverify=user?.isVerified;
         <Route path='/forget-password' element={<ForgetPassword/>}/>
         <Route path='/email-verify-send' element={<EmialVeficationSend/>}/>
 
-        <Route path='/password-reset/:token' element={<PasswordReset/>}/>
+        <Route path='/password-reset/:token' element={user ? <Navigate to="/"/>: <PasswordReset/>}/>
         <Route path="/email-verify" element={isverify ? <Navigate to="/"/>: <EmailVerify/>}/>
         <Route path='/login' element={user ?(isverify ? <Navigate to="/"/> :<Navigate to="/email-verify"/>): <Login/>}/>
       

@@ -51,7 +51,14 @@ const doctorSchema=new mongoose.Schema({
         type:String,
         required:true
     },
-    
+    appointmentsCount:{
+      type:Number,
+      default:0,
+    },
+    available:{
+        type:Boolean,
+        default:true
+    },
     role:{
         type:String,
         default:"doctor",

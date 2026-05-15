@@ -1,12 +1,20 @@
-import React from 'react';
+import { Loader } from 'lucide-react';
+import React, { useEffect } from 'react';
+import adminStore from '../../store/admin';
 
 const AllAppointments = () => {
+    const {loading,data,GetAppointments}=adminStore();
+  useEffect(()=>{
+    GetAppointments();
+  },[])
   const appointments = [
     { id: 1, patient: "Richard James", dept: "Richard James", age: 28, date: "24th July, 2024, 10:AM", doctor: "Dr. Richard James", fees: "$50" },
     { id: 2, patient: "Richard James", dept: "Richard James", age: 28, date: "24th July, 2024, 10:AM", doctor: "Dr. Richard James", fees: "$50" },
   ];
+    console.log("the comming data is this like this ookookookook okoko,ok ,",data)
+   if(loading) return <div className='flex justify-center items-center h-screen '><Loader size={45} className='animate-spin'/></div>
 
-  return (
+  return (data?.length==0 ||!data ) ? <p className='mt-10 text-center font-semibold'> No data found </p> :(
     <div className="p-8 max-sm:p-4 bg-gray-50 min-h-screen">
       <h1 className="text-xl font-medium text-gray-800 mb-6">All Appointments</h1>
       
@@ -25,7 +33,7 @@ const AllAppointments = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-500 ">
-            {appointments.map((appt, idx) => (
+            {data?.length>=0 && data?.map((appt, idx) => (
               <tr key={appt.id} className="hover:bg-gray-50 transition-colors ">
                 <td className="px-6 py-4 ">{idx + 1}</td>
                 <td className="px-6 py-4 flex items-center gap-3">

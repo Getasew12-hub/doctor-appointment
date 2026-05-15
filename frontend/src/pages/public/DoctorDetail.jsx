@@ -1,15 +1,13 @@
 import { BadgeCheck } from "lucide-react";
 import React, { useState } from "react";
+import {useLocation, useParams} from "react-router-dom"
+import doctorStore from "../../store/doctor";
+import { useEffect } from "react";
+import { LargeLoading } from "../../utils/Loading";
+import userStore from "../../store/user";
+import {useNavigate} from "react-router-dom"
+import toast from "react-hot-toast";
 
-const daySlots = [
-  { day: "WED", date: 25, active: true },
-  { day: "THU", date: 26 },
-  { day: "FRI", date: 27 },
-  { day: "SAT", date: 28 },
-  { day: "SUN", date: 1 },
-  { day: "MON", date: 2 },
-  { day: "TUE", date: 3 },
-];
 
 const timeSlots = [
   "10:00 am",
@@ -26,7 +24,54 @@ const timeSlots = [
   "04:00 pm",
   "04:30 pm",
 ];
+  let daySlots = [
+    { day: "SUN" ,dayNum:7},
+  { day: "MON" ,dayNum:1},
+  { day: "TUE",dayNum:2},
+  { day: "WED",dayNum:3 },
+  { day: "THU" ,dayNum:4},
+  { day: "FRI" ,dayNum:5},
+  { day: "SAT" ,dayNum:6},
 
+];
+
+  const today=new Date();
+ const  curentday=parseInt(today.getDate());
+ let todaynumber=parseInt(today.getDay());
+  for(let i=curentday;i<today.getDate()+7;i++){
+     let daymonth=i;
+     let dayinNumber=todaynumber;
+        if(dayinNumber>7){
+          dayinNumber=(dayinNumber%7);
+        }
+
+        if(i>30){
+         daymonth=(daymonth%30);
+        
+       }
+    
+       const updatevalu= daySlots.map((pre)=>{
+         
+          
+              if(pre.dayNum===dayinNumber){
+                 if(pre.dayNum==today.getDay()){
+                  return {
+                     ...pre,
+                  date:daymonth,
+                  active:true
+                  }
+                 }
+                return {
+                  ...pre,
+                  date:daymonth,
+                }
+              }
+            return pre;
+           })
+          todaynumber++; 
+         daySlots=updatevalu;
+       console.log("the update value is this :::::::;",updatevalu)
+  }
 const relatedDoctors = [
   {
     name: "Dr. Timothy White",
@@ -41,8 +86,30 @@ const relatedDoctors = [
 ];
 
  function DoctorDetail() {
-  const [selectedTime, setSelectedTime] = useState("10:00 am");
+  const {user}=userStore();
+  const navigate=useNavigate();
+const [selectedDaySlots,setSelectedDaySlots]=useState(daySlots.find(pre=>pre.active==true));
+const [selectedTime, setSelectedTime] = useState("10:00 am");
+  
+  const {GetReletedDoctors,loading,doctor}=doctorStore();
+  const {state} = useLocation();
+  const {id}=useParams();
+  console.log("the state is this why this not work as expected:::",state);
+  useEffect(() => {
+   
+    GetReletedDoctors(id,state?.speciality);
+  },[])
 
+
+
+function handleBooking (){
+  if(!user){
+    toast.error("Please first login or register",{position:"top-right"})
+    navigate("/login")
+  }
+  console.log("the selected day slot is this :::",selectedDaySlots);
+  console.log("the selected date number  :::",selectedTime);
+}
   return (
     <div className="mx-auto  px-4 py-6 md:px-8 max-w-vl w-full ">
       {/* Top Doctor Card */}
@@ -50,50 +117,47 @@ const relatedDoctors = [
         <div className="grid md:grid-cols-[280px_1fr]">
           <div className="flex items-end justify-center bg-main">
             <img
-              src="/topdoctor/image1.png"
-              alt="Dr. Emily Larson"
-              className="h-[210px] w-full object-contain"
+              src={state?.image}
+              alt={state?.name}
+              className="h-full w-full object-cover"
             />
           </div>
 
           <div className="p-5 md:pr-8">
             <h1 className="text-2xl font-semibold text-slate-800 md:text-3xl flex items-center gap-2">
-              Dr. Emily Larson <span className="text-main "><BadgeCheck size={15} /></span>
+              {state?.name} <span className="text-main "><BadgeCheck size={15} /></span>
             </h1>
 
             <p className="mt-1 text-sm text-slate-600">
-              MBBS - Gynecologist
+             {state?.education}
               <span className="ml-2 rounded-full border border-slate-300 px-2 py-[2px] text-[11px] text-slate-500">
-                3 Yrs
+              {state?.experience}
               </span>
             </p>
 
             <h2 className="mt-4 text-sm font-semibold text-slate-800">About</h2>
             <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-600">
-              Dr. Davis has a strong commitment to delivering comprehensive medical
-              care, focusing on preventive medicine, early diagnosis, and effective
-              treatment strategies. Dr. Davis has a strong commitment to delivering
-              comprehensive medical care, focusing on preventive medicine, early
-              diagnosis, and effective treatment strategies.
+              {state?.about}
             </p>
 
             <p className="mt-4 text-sm font-semibold text-slate-800">
-              Appointment fee: $60
+              Appointment fee: ${state?.fees}
             </p>
           </div>
         </div>
       </section>
 
       {/* Booking Slots */}
-      <section className="mt-8 md:ml-[190px]">
+      <section className="mt-8 md:ml-47.5">
         <h3 className="mb-4 text-sm font-medium text-slate-700">Booking slots</h3>
 
         <div className="flex gap-2 overflow-x-auto pb-2">
           {daySlots.map((slot) => (
             <button
               key={`${slot.day}-${slot.date}`}
-              className={`flex max-sm:h-10 max-sm:min-w-10 h-16 min-w-16 flex-col items-center justify-center rounded-full border text-xs transition max-sm:text-[10px] ${
-                slot.active
+              onClick={()=>setSelectedDaySlots(slot)}
+              className={`flex max-sm:h-10 max-sm:min-w-10 h-16 min-w-16 flex-col cursor-pointer items-center justify-center rounded-full border text-xs transition max-sm:text-[10px] ${
+                slot.dayNum==selectedDaySlots.dayNum
                   ? "border-main bg-main text-white"
                   : "border-slate-300 bg-white text-slate-600 hover:border-indigo-300"
               }`}
@@ -111,7 +175,7 @@ const relatedDoctors = [
               <button
                 key={time}
                 onClick={() => setSelectedTime(time)}
-                className={`h-8 min-w-[82px] rounded-full border px-3 text-xs transition ${
+                className={`h-8 min-w-20.5 rounded-full border px-3 text-xs transition cursor-pointer ${
                   active
                     ? "border-main bg-main/20 text-main"
                     : "border-slate-300 bg-white text-slate-500 hover:border-indigo-300"
@@ -123,7 +187,9 @@ const relatedDoctors = [
           })}
         </div>
 
-        <button className="mt-4 h-10 min-w-[220px] rounded-full bg-main/90 px-6 text-sm font-medium text-white hover:bg-main/100">
+        <button
+         onClick={handleBooking}
+         className="mt-4 h-10 min-w-55 rounded-full bg-main/90 px-6 text-sm font-medium text-white hover:bg-main cursor-pointer">
           Book an appointment
         </button>
       </section>
@@ -138,9 +204,11 @@ const relatedDoctors = [
             Simply browse through our extensive list of trusted doctors.
           </p>
         </div>
-
+        {loading && <LargeLoading/>}
+        {doctor?.length==0 && <p className='mt-5 text-center w-full '>Not data found</p>}
+    
         <div className="mt-8 flex flex-wrap gap-4">
-          {relatedDoctors.map((doc) => (
+          {doctor?.length>0 &&   doctor?.map((doc) => (
             <article
               key={doc.name}
               className="w-[175px] overflow-hidden rounded-xl border border-blue-200 bg-white"

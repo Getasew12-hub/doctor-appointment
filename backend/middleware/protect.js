@@ -1,6 +1,7 @@
 
 import jwt from "jsonwebtoken"
 import User from "../model/user.js"
+import Doctors from "../model/doctor.js"
 
 export const userProtect = async(req, res, next) => {
     try {
@@ -10,10 +11,13 @@ export const userProtect = async(req, res, next) => {
 
         const getuserid=jwt.verify(token,process.env.SECRET_KEY);
         if(!getuserid) return res.status(401).json({message:"Not authorized"});
-
-        const user=await User.findById(getuserid.id);
-        
-        if(!user) return res.status(401).json({message:"Not authorized"});
+        let user
+         user =await User.findById(getuserid.id);
+         
+        if(!user){
+            user=await Doctors.findById(getuserid.id);
+             if(!user) return res.status(401).json({message:"Not authorized"});
+        } 
         req.user=user;
         next();
 
@@ -35,7 +39,7 @@ export const doctorProtect=async (req,res,next) => {
         const getuserid=jwt.verify(token,process.env.SECRET_KEY);
         if(!getuserid) return res.status(401).json({message:"Not authorized"});
 
-        const user=await User.findById(getuserid.id);
+        const user=await Doctors.findById(getuserid.id);
         if(!user) return res.status(401).json({message:"Not authorized"});
 
         if(user.role!=="doctor") return res.status(401).json({message:"Not authorized"});

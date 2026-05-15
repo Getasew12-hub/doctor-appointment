@@ -1,8 +1,15 @@
 import React from 'react';
 import { Mail, Phone, MoreVertical } from 'lucide-react';
+import doctorDashboradStore from '../../store/doctorDashboard';
+import { LargeLoading } from '../../utils/Loading';
+import { useEffect } from 'react';
 
 const DoctorPatients = () => {
-  // Mock data for patients specific to this doctor
+  const {loading,DoctorPatients,data}=doctorDashboradStore();
+  
+useEffect(()=>{
+  DoctorPatients();
+},[])
   const patients = [
     { id: 'P-101', name: 'Richard James', gender: 'Male', age: 28, lastVisit: '24 Jul 2024', phone: '+1 234 567 890', img: 'https://i.pravatar.cc/150?u=p1' },
     { id: 'P-102', name: 'Richard James', gender: 'Female', age: 32, lastVisit: '22 Jul 2024', phone: '+1 234 567 891', img: 'https://i.pravatar.cc/150?u=p2' },
@@ -10,6 +17,8 @@ const DoctorPatients = () => {
     { id: 'P-104', name: 'Richard James', gender: 'Female', age: 19, lastVisit: '18 Jul 2024', phone: '+1 234 567 893', img: 'https://i.pravatar.cc/150?u=p4' },
     { id: 'P-105', name: 'Richard James', gender: 'Male', age: 28, lastVisit: '15 Jul 2024', phone: '+1 234 567 894', img: 'https://i.pravatar.cc/150?u=p5' },
   ];
+
+if(loading) return <LargeLoading/>
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen max-sm:p-0">
@@ -21,18 +30,20 @@ const DoctorPatients = () => {
 
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
           {/* Table Header */}
-          <div className="hidden lg:grid grid-cols-[1fr_2fr_1fr_1.5fr_1.5fr_0.5fr] gap-4 p-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-600">
+        {data?.length!==0 ? <div className="hidden lg:grid grid-cols-[1fr_2fr_1fr_1.5fr_1.5fr_0.5fr] gap-4 p-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-600">
             <span>Patient ID</span>
             <span>Patient Name</span>
             <span>Age / Gender</span>
             <span>Contact</span>
             <span>Last Visit</span>
             <span className="text-center">Action</span>
-          </div>
+          </div>:
+
+          <p className='text-center my-4'>No Patient Found</p>}
 
           {/* Table Body */}
           <div className="divide-y divide-gray-100">
-            {patients.map((patient) => (
+            {data?.length!==0 && data?.map((patient) => (
               <div 
                 key={patient.id} 
                 className="grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr_1.5fr_1.5fr_0.5fr] gap-4 p-4 items-center hover:bg-gray-50 transition-all"

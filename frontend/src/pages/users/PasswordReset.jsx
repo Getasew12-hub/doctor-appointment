@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import userStore from "../../store/user"
 import { Loader } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useParams } from 'react-router-dom';
 
 const CreateAccount = () => {
-  const {loading,SignupUser,LoginUser}=userStore()
+  const {loading,SignupUser,LoginUser,UserPasswordReset}=userStore()
   
   const [formData, setFormData] = useState({
 
@@ -11,15 +13,22 @@ const CreateAccount = () => {
     confirmPassword: ''
 
   });
+ const {token}=useParams();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  function hadleSubmite(e) {
+  async function hadleSubmite(e) {
     e.preventDefault();
-   
-   console.log("you enter value is this ,",formData);
+    const password=formData.password.trim();
+   const  confirmPassword=formData.confirmPassword.trim();
+    if(password.length<6)return toast.error("Password must be at list 6 charactors",{position:'top-right'});
+
+    if(password!==confirmPassword) return toast.error("Password not match",{position:'top-right'});
+
+  await UserPasswordReset(password,token);
+
   }
 
   return (

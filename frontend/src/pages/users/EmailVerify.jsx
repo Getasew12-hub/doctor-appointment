@@ -6,7 +6,7 @@ import { Loader } from 'lucide-react';
 
 function EmailVerify() {
     const navigate = useNavigate();
-    const { EmailVerify, loading ,ResendEmailCode} = userStore();
+    const { EmailVerify, loading ,ResendEmailCode,user} = userStore();
     const [inputs, setInputs] = useState(['', '', '', '', '', '']);
     const inputRef = useRef([]);
 
@@ -15,7 +15,7 @@ function EmailVerify() {
             sumbitemail();
         }
     }, [inputs]);
-
+ console.log("the current user is this ",user);
     function handleInput(index, val) {
         const newvalue = [...inputs];
 
@@ -82,7 +82,7 @@ function handleResend() {
                 Verify your email
             </h2>
             <p className="text-gray-500 text-sm max-w-88 mx-auto max-sm:text-xs">
-                We sent a verification code to your email address. Check your inbox and enter the code below.
+                We sent a verification code to your email address <span className='font-semibold text-gray-700'>{user?.email}</span>. Check your inbox and enter the code below.
             </p>
 
             <form  className="mt-6">

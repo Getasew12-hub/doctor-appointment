@@ -58,6 +58,7 @@ const userStore=create((set,get)=>({
         
     },
     LogoutUser:async () => {
+        console.log("i am call and i work now");
         try {
             const response=await axios.post("/auth/logout");
             set({user:null});
@@ -141,6 +142,21 @@ const userStore=create((set,get)=>({
             
         }finally {
             set({loading:false});
+        }
+        
+    },
+    UserPasswordReset:async (password,token) => {
+         set({loading:true})
+        try {
+            const response=await axios.post(`/auth/reset-password/${token}`,{password})
+            toast.success(response.data.message,{position:"top-right"})
+             set({user:response.data.data})
+        } catch (error) {
+            console.log("error on password reset",error);
+            toast.error(error.response.data.message || "Internal server error",{position:"top-right"})
+            
+        }finally{
+         set({loading:false})
         }
         
     }

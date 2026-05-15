@@ -1,20 +1,32 @@
 import React from 'react';
+import adminStore from '../../store/admin';
+import { useEffect } from 'react';
+import { Loader } from 'lucide-react';
+import { LargeLoading } from '../../utils/Loading';
 
 // Sample data representing the patient list
-const patientsData = [
-  { id: 1, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Completed' },
-  { id: 2, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Pending' },
-  { id: 3, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Cancelled' },
-  { id: 4, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Completed' },
-  { id: 5, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Completed' },
-];
+// const patientsData = [
+//   { id: 1, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Completed' },
+//   { id: 2, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Pending' },
+//   { id: 3, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Cancelled' },
+//   { id: 4, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Completed' },
+//   { id: 5, name: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', doctor: 'Dr. Richard James', fees: '$50', status: 'Completed' },
+// ];
 
 const PatientList = () => {
-  return (
+  const {PatientsList,loading,data:patientsData}=adminStore();
+  useEffect(()=>{
+    PatientsList();
+  },[]);
+
+ if(loading) return <LargeLoading/>;
+ console.log("patient data is this ",patientsData)
+
+  return patientsData?.length==0 ? <p className='font-semibold text-center mt-10'>No data found</p>: (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-xl font-medium text-gray-700">All Patients</h2>
+          <h2 className="text-xl font-medium text-gray-700 ">All Patients</h2>
         </div>
 
         {/* Scrollable container for mobile responsiveness */}
@@ -32,8 +44,8 @@ const PatientList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {patientsData.map((patient, index) => (
-                <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
+              {patientsData?.map((patient, index) => (
+                <tr key={patient._id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-gray-500 text-sm">{index + 1}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -62,16 +74,8 @@ const PatientList = () => {
             </tbody>
           </table>
         </div>
-        
-        {/* Simple Pagination Placeholder */}
-        <div className="p-4 border-t border-gray-100 flex justify-between items-center text-sm text-gray-500">
-          <p>Showing 1 to {patientsData.length} of {patientsData.length} entries</p>
-          <div className="flex gap-2">
-            <button className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50">Prev</button>
-            <button className="px-3 py-1 bg-blue-600 text-white rounded">1</button>
-            <button className="px-3 py-1 border rounded hover:bg-gray-50">Next</button>
-          </div>
-        </div>
+       
+       
       </div>
     </div>
   );

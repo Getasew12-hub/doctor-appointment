@@ -1,8 +1,13 @@
 import React from 'react';
 import { Check, X } from 'lucide-react';
-
+import doctorDashboradStore from '../../store/doctorDashboard';
+import { useEffect } from 'react';
+import { LargeLoading } from '../../utils/Loading';
 const DoctorAppointments = () => {
-  // Mock data for doctor's specific appointments
+const {loading,data,AllDoctorAppointments}=doctorDashboradStore();
+useEffect(()=>{
+  AllDoctorAppointments();
+},[])
   const appointments = [
     { id: 1, patient: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', status: 'Pending', fees: '$50', img: 'https://i.pravatar.cc/150?u=a' },
     { id: 2, patient: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', status: 'Cancelled', fees: '$50', img: 'https://i.pravatar.cc/150?u=b' },
@@ -11,6 +16,8 @@ const DoctorAppointments = () => {
     { id: 5, patient: 'Richard James', age: 28, date: '24 Jul 2024', time: '10:00 AM', status: 'Completed', fees: '$50', img: 'https://i.pravatar.cc/150?u=e' },
   ];
 
+  if(loading) return <LargeLoading/>;
+  console.log("what happen in the comming data :::",data)
   return (
     <div className="p-6  bg-gray-50 min-h-screen max-sm:p-0">
       <div className="max-w-6xl mx-auto">
@@ -18,18 +25,19 @@ const DoctorAppointments = () => {
 
         <div className="bg-white border border-gray-200 rounded-xl overflow-y-hidden overflow-x-auto shadow-sm  ">
           {/* Table Header */}
-          <div className="hidden lg:grid grid-cols-[0.5fr_2fr_1fr_2fr_1fr_1fr] gap-4 p-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-600">
+         {data?.length!==0 ? <div className="hidden lg:grid grid-cols-[0.5fr_2fr_1fr_2fr_1fr_1fr] gap-4 p-4 bg-gray-50 border-b border-gray-100 text-sm font-semibold text-gray-600">
             <span>#</span>
             <span>Patient</span>
             <span>Age</span>
             <span>Date & Time</span>
             <span>Fees</span>
             <span className="text-center">Action</span>
-          </div>
+          </div>:
+          <p className='text-center my-4'>No data found</p>}
 
           {/* List Content */}
           <div className="divide-y divide-gray-200">
-            {appointments.map((item, index) => (
+            {data?.length>0 && data?.map((item, index) => (
               <div 
                 key={item.id} 
                 className="grid grid-cols-1 lg:grid-cols-[0.5fr_2fr_1fr_2fr_1fr_1fr] gap-4 p-4 items-center hover:bg-gray-50 transition-colors"

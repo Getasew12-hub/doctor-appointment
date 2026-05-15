@@ -3,7 +3,7 @@ import User from "../model/user.js";
 import bcrypt from "bcrypt";
 import {sendEmail,PASSWORD_FORGOT} from "../utils/sendEmail.js";
 import crypto from "crypto";
-
+import Doctors from "../model/doctor.js";
 
 const createToken=async(id,res)=>{
 
@@ -93,9 +93,15 @@ export const Login = async(req, res) => {
        try {
         const {email,password} =req.body;
         if(!email || !password) return res.status(400).json({success:false,message:"Please enter all value"})
+              let getuser
+            getuser=await User.find({email});
 
-            const getuser=await User.find({email});
-            if(!getuser || getuser.length==0) return res.status(400).json({success:false,message:"User doesn't exist"})
+            if(!getuser || getuser.length==0){
+                 getuser=await Doctors.find({email});
+                if(!getuser || getuser.length==0) return res.status(400).json({success:false,message:"User doesn't exist"})
+            }
+                
+                
 
             const userpassword=getuser[0].password;
             
@@ -196,8 +202,8 @@ export const ForgetPassword=async(req,res)=>{
         const token=  crypto.randomBytes(20).toString('hex');
         const now=new Date();
         const day=new Date(now.getTime()+1000*60*60);                            
-       await User.updateOne({email:user.email},{$set:{resetpasswordtoken:token,resetpasswordexpire:day}}); 
-
+       await User.updateOne({email:user.email},{$set:{resetPasswordToken:token,resetpasswordexpire:day}}); 
+     
        await PASSWORD_FORGOT(user.email,token);
 
         return res.status(200).json({success:true,message:"We sent an link on you email address to reset password,please check you email"});
@@ -212,18 +218,27 @@ export const ResetPassword=async(req,res)=>{
     try {
         const  {password}=req.body;
         const {token}=req.params;
+        
         if(!token || !password) return res.status(400).json({success:false,message:"Please enter all value"})
        
       
         if(password.length<6) return res.status(400).json({success:false,message:"Password must be at least 6 characters"})
-        const getuser=await User.find({resetpasswordtoken:token,restpasswordexpire:{$gt:new Date()}});
+      
+        const getuser=await User.findOne({resetPasswordToken:token,resetpasswordexpire:{$gt:new Date()}});
+        
         if(getuser.length==0) return res.status(400).json({success:false,message:"Invalid token or you use expire token"});
-        const user=getuser[0];
+        const user=getuser;
 
         const hashpassword=await bcrypt.hash(password,10);   
         await User.updateOne({email:user.email},{$set:{password:hashpassword,resetpasswordtoken:undefined,restpasswordexpire:undefined}});
+        await createToken(getuser._id,res);
 
-        return res.status(200).json({success:true,message:"Password reset successful"});     
+        return res.status(200).json({success:true,message:"Password reset successful",data:{
+          ...getuser._doc,
+            password: undefined,
+            emailVerifyCode: undefined,
+            emailVerifyExpire: undefined
+        }});     
     } catch (error) {
         console.log("error on reset password",error.message);
         return res.status(500).json({success:false,message:"Internal server error"})

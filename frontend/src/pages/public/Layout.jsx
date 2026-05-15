@@ -32,7 +32,7 @@ const categories = [
               <button
                 key={index}
                 onClick={() => { navigate(cat.href);setSelectedCategory(cat.name)}}
-                className={`w-full rounded-md border px-3 py-2 text-left max-sm:text-sm  transition ${
+                className={`w-full rounded-md border px-3 py-2 text-left max-sm:text-sm  transition cursor-pointer ${
                   activePath===cat.href
                     ? "border-indigo-200 bg-indigo-100 text-main-700"
                     : "border-slate-300 bg-white text-slate-600 hover:border-indigo-200"

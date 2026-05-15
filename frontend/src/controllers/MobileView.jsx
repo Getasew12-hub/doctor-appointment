@@ -1,7 +1,8 @@
-import { ClipboardClock, Contact, Home, Info, LogIn, LogOut, User, Users, X } from 'lucide-react'
+import { ClipboardClock, Contact, Home, Info, LayoutDashboard, LogIn, LogOut, User, Users, X } from 'lucide-react'
 import React, { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link,useNavigate} from 'react-router-dom'
 import userStore from '../store/user'
+
 
 const navLinks=[{
   name:"Home",
@@ -9,7 +10,7 @@ const navLinks=[{
   icon:<Home size={19}/>
 },{
   name:"All Doctors",
-  link:"/all-doctors",
+  link:"/doctors",
   icon:<Users size={19}/>
 },{
   name:"About",
@@ -24,7 +25,11 @@ const navLinks=[{
 
 function MobileView({handleMobileView,openMobileview,setOpenMobileview}) {
     const {user,LogoutUser}=userStore(state=>state);
+    const admin=user?.role==="admin";
     const mobileref=useRef();
+    const naviage=useNavigate();
+
+
     useEffect(()=>{
 
   const closeMobilView=(e)=>{
@@ -44,12 +49,13 @@ function MobileView({handleMobileView,openMobileview,setOpenMobileview}) {
                 {navLinks.map((link,index)=>(
                   <Link key={index}  onClick={handleMobileView} className='mobileview'  to={link.link}>{link.icon} {link.name}</Link>
                 ))}
-                
+                {admin && <Link to="/admin" onClick={handleMobileView}  className='mobileview'><LayoutDashboard size={19} />Dashboard</Link>}
+
         {user &&<>    <Link to={"/Contact"} onClick={handleMobileView}  className='mobileview'><ClipboardClock size={19} />My Appointments</Link>
               <Link to={"/Contact"} onClick={handleMobileView}  className='mobileview'><User size={19} />My Profile</Link>
               </>
          }
-           {user ? <button  className='mobileview'><LogOut size={19} onClick={LogoutUser}/>Logout</button>:<button  className='mobileview'><LogIn size={19}/>Login</button>}
+           {user ? <button  className='mobileview cursor-pointer' onClick={()=>{handleMobileView(),LogoutUser()}}><LogOut size={19} />Logout </button>:<button  className='mobileview cursor-pointer' onClick={()=>{handleMobileView(),naviage("/login")}}><LogIn size={19}  />Login </button>}
        </div>
   )
 }

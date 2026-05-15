@@ -1,16 +1,26 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import adminStore from '../../store/admin';
+import { Loader } from 'lucide-react';
 
 function Dashboard() {
-      const metrics = [
-    { icon: "👨‍⚕️", value: 14, label: "Doctors", color: "bg-blue-50" },
-    { icon: "📅", value: 2, label: "Appointments", color: "bg-indigo-50" },
-    { icon: "👥", value: 5, label: "Patients", color: "bg-blue-50" },
-  ];
+ 
+  const {loading,data,GetDashboardData}=adminStore();
+  useEffect(()=>{
+    GetDashboardData();
+  },[])
 
-  const latestAppointments = Array(15).fill({
+   const latestAppointments = Array(15).fill({
     name: "Dr. Richard James",
     date: "24th July, 2024"
   });
+  
+  if(loading) return <div className='flex justify-center items-center h-screen '><Loader size={45} className='animate-spin'/></div>; 
+
+       const metrics = [
+    { icon: "👨‍⚕️", value: data?.totalDoctors || 0, label: "Doctors", color: "bg-blue-50" },
+    { icon: "📅", value: data?.totalAppointments || 0, label: "Appointments", color: "bg-indigo-50" },
+    { icon: "👥", value: data?.totalPatients || 0, label: "Patients", color: "bg-blue-50" },
+  ];
   return (
     <div>
       {/* Main Content */}
@@ -38,7 +48,7 @@ function Dashboard() {
           </div>
           
           <div className="divide-y divide-gray-50">
-            {latestAppointments.map((appt, i) => (
+            {data?.latestAppointments?.map((appt, i) => (
               <div key={i} className="p-4 px-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-gray-200 rounded-full overflow-hidden">

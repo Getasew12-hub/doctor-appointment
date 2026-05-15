@@ -1,18 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import doctorStore from '../../store/doctor';
+import { Loader } from 'lucide-react';
 
 const DoctorProfile = () => {
+    const {GetDoctorProfile,loading,doctor}=doctorStore();
     const navigate = useNavigate();
-    const doctor ={
-        id: 1,
-        name: 'Dr. John Doe',
-        image: '/topdoctor/image1.png',
-        speciality: 'General Physician',
-        education: 'MBBS, MD (General Medicine)',
-        experience: '10 years',
-        about:"Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium, quia?Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium, quia?",
-    }
-  // If no doctor is selected yet, you can show a loader or empty state
+    const {id}=useParams();
+   useEffect(()=>{
+    GetDoctorProfile(id);
+   },[])
+
+ 
+   if(loading) return <div className='flex justify-center items-center h-8/12 '><Loader size={45} className='animate-spin'/></div>; 
+
   if (!doctor) return <div className="p-8 text-center text-gray-500">Select a doctor to view details.</div>;
 
   return (

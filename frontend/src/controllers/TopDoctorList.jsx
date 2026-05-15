@@ -1,6 +1,7 @@
-import { Dot } from 'lucide-react'
-import React from 'react'
+import { Dot, Loader } from 'lucide-react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
+import doctorStore from "../store/doctor"
 const doctorList=[
     {
         id:1,
@@ -89,6 +90,14 @@ const doctorList=[
 
 function TopDoctorList() {
     const navigator=useNavigate();
+    const {GetTopDoctorList,loading,doctor}=doctorStore();
+
+    useEffect(()=>{
+        GetTopDoctorList();
+    },[])
+  
+    if(loading) return <div className='flex justify-center items-center h-screen '><Loader size={45} className='animate-spin'/></div>;
+  
   return (
     <div className='mt-20 text-center flex flex-col justify-center items-center gap-6'>
         <div>
@@ -98,14 +107,14 @@ function TopDoctorList() {
        
 
         <div className='grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-3  w-full   '>
-            {doctorList.map((val,index)=>
-            <div key={index} className='border border-gray-200 rounded-md text-left cursor-pointer ' onClick={()=>navigator(`/appointment/${val.id}`)}>
-                <div className='bg-gray-100 flex justify-center h-70 overflow-hidden items-end max-sm:h-60 max-vs:h-40!'>
-                    <img src={val.image} alt={val.name} className='object-cover h-full ' />
+            {doctor?.map((val,index)=>
+            <div key={index} className='border border-gray-200 rounded-md text-left cursor-pointer overflow-hidden ' onClick={()=>navigator(`/appointment/${val._id}`,{state:val})}>
+                <div className='bg-gray-100 flex justify-center h-70 overflow-hidden items-end max-sm:h-60 max-vs:h-40! '>
+                    <img src={val.image} alt={val.name} className='object-cover h-full w-full ' />
                 </div>
 
                 <div className='p-2.5'>
-                  {val.avalablity ? <p className='flex text-vs items-center text-green-500 -translate-x-2'><Dot /> Available</p>: <p className='flex text-vs items-center text-gray-500 mb-1.5'>Not Available</p>}
+                  {val.available ? <p className='flex text-vs items-center text-green-500 -translate-x-2'><Dot /> Available</p>: <p className='flex text-vs items-center text-gray-500 mb-1.5'>Not Available</p>}
                 <p className='text-vs sm:text-sm font-semibold'>{val.name}</p>
                 <p className='text-vs text-gray-500'>{val.job}</p>
                 </div>
@@ -114,7 +123,9 @@ function TopDoctorList() {
             )}
         </div>
 
-        <button className='bg-gray-200 rounded-full py-2 px-8 text-sm mt-8'>more</button>
+        <button
+        onClick={()=>navigator("/doctors")}
+         className='bg-gray-200 rounded-full py-2 px-8 text-sm mt-8 cursor-pointer' >more</button>
     </div>
   )
 }

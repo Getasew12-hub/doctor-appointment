@@ -4,32 +4,32 @@ import {useNavigate} from "react-router-dom"
 const navigationLink=[
   {
    name:"General physician",
-   link:"/general-physician",
+   link:"/doctors/general-physician",
    image:"/find/image0.png"
 },
   {
    name:"Gynecologist",
-   link:"/gynecologist",
+   link:"/doctors/gynecologist",
    image:"/find/image1.png"
 },
   {
    name:"Dermatologist",
-   link:"/dermatologist",
+   link:"/doctors/dermatologist",
    image:"/find/image2.png"
 },
   {
    name:"Pediatricians",
-   link:"/pediatricians",
+   link:"/doctors/pediatricians",
    image:"/find/image3.png"
 },
   {
    name:"Neurologist",
-   link:"/neurologist",
+   link:"/doctors/neurologist",
    image:"/find/image4.png"
 },
   {
    name:"Gastroenterologist",
-   link:"/gastroenterologist",
+   link:"/doctors/gastroenterologist",
    image:"/find/image5.png"
 },
 

@@ -1,38 +1,32 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import doctorStore from '../store/doctor';
+import {Loader} from "lucide-react";
+import ImageBox from './ImageBox';
 
-const doctors = [
+// const doctors = [
 
 
-  { id: 13, name: "Dr. Richard James", role: "General physician", image: "/topdoctor/image3.png" },
-  { id: 14, name: "Dr. Richard James", role: "General physician", image: "/topdoctor/image4.png" },
-  { id: 15, name: "Dr. Richard James", role: "General physician", image: "/topdoctor/image5.png" },
+//   { id: 13, name: "Dr. Richard James", role: "General physician", image: "/topdoctor/image3.png" },
+//   { id: 14, name: "Dr. Richard James", role: "General physician", image: "/topdoctor/image4.png" },
+//   { id: 15, name: "Dr. Richard James", role: "General physician", image: "/topdoctor/image5.png" },
 
-];
+// ];
 
 
 function GeneralDocors() {
-  return (
-           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {doctors.map((doctor) => (
-            <article
-              key={doctor.id}
-              className="overflow-hidden rounded-md border border-blue-200 bg-white"
-            >
-              <div className='h-36 bg-blue-50 flex justify-center items-center overflow-hidden'>
+  const {GetDoctorbySpecialist,loading,doctor}=doctorStore();
+  useEffect(()=>{
+    GetDoctorbySpecialist("General physician");
+  },[])
 
-                <img
-                src={doctor.image}
-                alt={doctor.name}
-                className="h-full object-contain"
-              />
-              </div>
+  if(loading) return  <div className='flex justify-center items-center h-screen '><Loader size={45} className='animate-spin'/></div>;
 
-              <div className="p-2.5">
-                <p className="text-[10px] font-medium text-green-600">• Available</p>
-                <h3 className="mt-1 text-sm font-medium text-slate-800">{doctor.name}</h3>
-                <p className="text-[11px] text-slate-500">{doctor.role}</p>
-              </div>
-            </article>
+  return doctor?.length==0 ? <p className='mt-5 text-center w-full '>Not data found</p> :(
+           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4
+           ">
+            
+          {doctor?.length>0 && doctor?.map((doctor) => (
+           <ImageBox doctor={doctor} key={doctor._id}/>
           ))}
         </div>
   )
